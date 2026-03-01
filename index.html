@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>F1 Versenymérnök Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/vue@3/dist/vue.global.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Titillium+Web:ital,wght@0,400;0,600;0,700;0,900;1,400;1,700&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons: Profi, letisztult vektoros ikonok -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <style>
+        body { 
+            font-family: 'Titillium Web', sans-serif; 
+            background-color: #111115; 
+            color: #ffffff; 
+        }
+        
+        .bg-f1-red { background-color: #e10600; }
+        .text-f1-red { color: #e10600; }
+        .border-f1-red { border-color: #e10600; }
+        .bg-f1-dark { background-color: #15151e; }
+        .bg-f1-panel { background-color: #1e1e24; }
+        
+        .f1-italic { font-style: italic; font-weight: 700; letter-spacing: 0.5px; }
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: #111115; }
+        ::-webkit-scrollbar-thumb { background: #38383f; }
+        ::-webkit-scrollbar-thumb:hover { background: #e10600; }
+        
+        .tv-graphic-bg {
+            background-image: repeating-linear-gradient(
+                -45deg,
+                rgba(255, 255, 255, 0.02),
+                rgba(255, 255, 255, 0.02) 2px,
+                transparent 2px,
+                transparent 8px
+            );
+        }
+    </style>
+</head>
+<body class="h-screen w-screen overflow-hidden flex flex-col p-4 gap-4 bg-f1-dark">
+
+    <div id="app" class="flex flex-col h-full gap-4 max-w-screen-2xl mx-auto w-full">
+        <!-- HEADER -->
+        <div class="bg-f1-panel border-l-4 border-f1-red flex justify-between items-center shadow-lg relative tv-graphic-bg">
+            <div class="flex items-center h-full">
+                <!-- LOGÓ KONTÉNER: Tisztán kódolt SVG logó a feltöltött kép alapján (nincs szükség külső képfájlra) -->
+                <div class="px-6 py-2 h-24 flex items-center justify-center bg-black border-r border-gray-800 min-w-[300px]">
+                    <svg viewBox="0 0 300 120" class="h-full w-auto drop-shadow-lg">
+                        <defs>
+                            <linearGradient id="metal" x1="0%" y1="0%" x2="0%" y2="100%">
+                                <stop offset="0%" stop-color="#8a8a95" />
+                                <stop offset="50%" stop-color="#4a4a55" />
+                                <stop offset="100%" stop-color="#1c1c22" />
+                            </linearGradient>
+                            <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+                                <feGaussianBlur stdDeviation="3" result="blur" />
+                                <feMerge>
+                                    <feMergeNode in="blur" />
+                                    <feMergeNode in="SourceGraphic" />
+                                </feMerge>
+                            </filter>
+                        </defs>
+                        
+                        <!-- Fém Z felső része -->
+                        <path d="M 110,20 L 200,20 L 175,45 L 125,45 Z" fill="url(#metal)" />
+                        <!-- Fém Z alsó része -->
+                        <path d="M 160,55 L 115,55 L 90,80 L 180,80 Z" fill="url(#metal)" />
+                        
+                        <!-- Zöld Neon EKG Vonal -->
+                        <path d="M 30,50 L 105,50 L 125,25 L 145,75 L 165,35 L 180,50 L 270,50" fill="none" stroke="#22c55e" stroke-width="2.5" filter="url(#neonGlow)" />
+                        
+                        <!-- Zöld Neon Pöttyök -->
+                        <circle cx="105" cy="50" r="2.5" fill="#4ade80" filter="url(#neonGlow)" />
+                        <circle cx="125" cy="25" r="2.5" fill="#4ade80" filter="url(#neonGlow)" />
+                        <circle cx="145" cy="75" r="2.5" fill="#4ade80" filter="url(#neonGlow)" />
+                        <circle cx="165" cy="35" r="2.5" fill="#4ade80" filter="url(#neonGlow)" />
+                        <circle cx="180" cy="50" r="2.5" fill="#4ade80" filter="url(#neonGlow)" />
+                        
+                        <!-- ZEROPOINT Felirat -->
+                        <text x="150" y="102" font-family="'Titillium Web', sans-serif" font-weight="900" font-size="19" fill="#ffffff" text-anchor="middle" letter-spacing="3">ZEROPOINT</text>
+                        
+                        <!-- RACE Felirat -->
+                        <text x="150" y="117" font-family="'Titillium Web', sans-serif" font-weight="700" font-size="11" fill="#22c55e" text-anchor="middle" letter-spacing="8">RACE</text>
+                        <line x1="85" y1="113" x2="110" y2="113" stroke="#22c55e" stroke-width="1" />
+                        <line x1="190" y1="113" x2="215" y2="113" stroke="#22c55e" stroke-width="1" />
+                    </svg>
+                </div>
+                <div class="px-6 flex flex-col justify-center">
+                    <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Pálya / IP: {{ state.ip_address || 'Keresés...' }}</div>
+                    <div class="text-2xl f1-italic text-white uppercase">{{ state.track_name || 'Ismeretlen' }}</div>
+                </div>
+            </div>
+
+            <div class="flex items-center gap-6 pr-6">
+                <a href="https://buymeacoffee.com/zeropointrace" target="_blank" class="border-2 border-amber-500 text-amber-500 hover:bg-amber-500 hover:text-black px-4 py-2 text-sm uppercase font-bold tracking-wider transition-all flex items-center gap-2">
+                    <i class="ph-fill ph-coffee text-lg"></i>
+                    Támogass egy sörrel
+                </a>
+
+                <button @click="testRadio" class="border border-gray-600 hover:border-white text-gray-300 hover:text-white px-4 py-2 text-sm uppercase font-bold tracking-wider transition-all active:bg-white active:text-black">
+                    Rádió Teszt
+                </button>
+                <div class="text-right flex flex-col justify-center">
+                    <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold">Verseny Állapot</div>
+                    <div class="text-2xl f1-italic text-white uppercase">{{ state.lap_info || 'Kör: 0 / 0' }}</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- FŐ TARTALOM (KÉT OSZLOP) -->
+        <div class="flex flex-col lg:flex-row gap-4 h-full overflow-hidden">
+            
+            <!-- BAL OSZLOP: LEADERBOARD -->
+            <div class="bg-f1-panel flex flex-col w-full lg:w-[45%] h-full shadow-lg overflow-hidden border-t-2 border-gray-700">
+                <div class="flex justify-between items-center p-3 border-b border-gray-700 bg-[#19191e]">
+                    <h2 class="text-lg uppercase f1-italic text-white">Élő Különbségek</h2>
+                    <span :class="state.is_connected ? 'text-green-500' : 'text-red-500'" class="text-xs font-bold tracking-widest uppercase">
+                        {{ state.connection_status || 'Várakozás a játékra...' }}
+                    </span>
+                </div>
+                
+                <div class="overflow-y-auto h-full relative">
+                    <table class="w-full text-left border-collapse">
+                        <thead class="sticky top-0 bg-[#19191e] z-10 shadow-md">
+                            <tr class="text-gray-400 text-xs uppercase font-bold">
+                                <th class="p-2 pl-4">Pos</th>
+                                <th class="p-2">Driver</th>
+                                <th class="p-2">Gap</th>
+                                <th class="p-2">Tyre</th>
+                                <th class="p-2">Age</th>
+                                <th class="p-2 text-center">Pit</th>
+                                <th class="p-2 pr-4">Pen</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-sm font-semibold">
+                            <tr v-for="row in state.leaderboard" :key="row.pos" 
+                                class="border-b border-gray-800 transition-colors"
+                                :class="row.is_me ? 'bg-f1-red text-white' : 'even:bg-[#15151e] odd:bg-[#1e1e24] hover:bg-gray-700'">
+                                
+                                <td class="p-2 pl-4 f1-italic text-lg" :class="row.is_me ? 'text-white' : 'text-gray-400'">{{ row.pos }}</td>
+                                <td class="p-2 uppercase tracking-wide text-lg" :class="row.is_me ? 'font-bold' : ''">{{ row.car }}</td>
+                                <td class="p-2 font-bold" :class="row.is_me ? 'text-white' : row.delta_color">{{ row.delta }}</td>
+                                <td class="p-2">
+                                    <span class="px-2 py-0.5 rounded text-black font-black text-xs" :style="{ backgroundColor: row.tyre_color }">
+                                        {{ row.tyre }}
+                                    </span>
+                                </td>
+                                <td class="p-2">{{ row.age }}</td>
+                                <td class="p-2 text-center">{{ row.pits }}</td>
+                                <td class="p-2 pr-4" :class="row.pen !== '-' && !row.is_me ? 'text-red-500' : ''">{{ row.pen }}</td>
+                            </tr>
+                            <tr v-if="!state.leaderboard || state.leaderboard.length === 0">
+                                <td colspan="7" class="p-8 text-center text-gray-500 uppercase tracking-widest text-xs">Várakozás a telemetria adatokra...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- JOBB OSZLOP: STRATÉGIA ÉS IDŐJÁRÁS -->
+            <div class="flex flex-col gap-4 w-full lg:w-[55%] h-full">
+                
+                <div class="bg-f1-panel flex flex-col h-full shadow-lg overflow-hidden border-t-2 border-gray-700 relative">
+                    <div class="flex justify-between items-center p-3 border-b border-gray-700 bg-[#19191e]">
+                        <h2 class="text-lg uppercase f1-italic text-white">Időjárás Radar</h2>
+                        <span class="text-xs uppercase tracking-widest text-gray-400 font-bold">{{ state.forecast_info || 'Nincs előrejelzés' }}</span>
+                    </div>
+
+                    <div class="overflow-y-auto h-full p-4 tv-graphic-bg">
+                        <div class="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 pb-4">
+                            
+                            <div v-for="lap in state.strategy_grid" :key="lap.lap" 
+                                class="flex flex-col items-center justify-center p-4 bg-[#111115] border-b-4 transition-all relative overflow-hidden"
+                                :class="lap.is_current ? 'border-b-f1-red shadow-[0_0_15px_rgba(225,6,0,0.3)] scale-[1.03] z-10' : 'border-b-transparent'">
+                                
+                                <div v-if="lap.is_current" class="absolute top-0 right-0 w-4 h-4 bg-f1-red" style="clip-path: polygon(100% 0, 0 0, 100% 100%);"></div>
+
+                                <i :class="[getWeatherIcon(lap.w_type).class, getWeatherIcon(lap.w_type).color]" class="text-5xl mb-2 drop-shadow-[0_0_8px_rgba(255,255,255,0.1)]"></i>
+                                
+                                <span class="font-bold text-xs uppercase tracking-widest" :class="lap.is_current ? 'text-white' : 'text-gray-400'">Kör {{ lap.lap }}</span>
+                                
+                                <div class="w-full bg-gray-800 h-1.5 mt-2 overflow-hidden">
+                                    <div class="h-full transition-all duration-500" 
+                                         :style="{ width: lap.progress + '%', backgroundColor: lap.progress_color }"></div>
+                                </div>
+                                <span class="text-[10px] font-bold mt-1" :class="lap.progress > 0 ? 'text-blue-400' : 'text-gray-600'">{{ lap.progress }}%</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ALUL: ÉRTESÍTÉSEK / LOG -->
+                <div class="bg-f1-panel border-l-4 border-f1-red p-3 shadow-lg shrink-0 h-16 flex flex-col justify-center">
+                    <div class="text-[10px] text-gray-400 uppercase tracking-widest font-bold mb-1">Rendszerüzenetek</div>
+                    <div class="text-f1-red font-bold text-sm h-5 overflow-hidden truncate uppercase">{{ state.error_msg }}</div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const { createApp, ref, onMounted } = Vue;
+
+        createApp({
+            setup() {
+                const state = ref({ leaderboard: [], strategy_grid: [] });
+                let ws = null;
+
+                const getWeatherIcon = (wType) => {
+                    if (wType === undefined) return { class: 'ph-fill ph-sun', color: 'text-amber-400' };
+                    
+                    const map = {
+                        0: { class: 'ph-fill ph-sun', color: 'text-amber-400' },                  
+                        1: { class: 'ph-fill ph-cloud-sun', color: 'text-gray-300' },             
+                        2: { class: 'ph-fill ph-cloud', color: 'text-gray-500' },                 
+                        3: { class: 'ph-fill ph-cloud-rain', color: 'text-blue-400' },            
+                        4: { class: 'ph-fill ph-cloud-rain', color: 'text-blue-600' },            
+                        5: { class: 'ph-fill ph-cloud-lightning', color: 'text-purple-500' }      
+                    };
+                    return map[wType] || map[0];
+                };
+
+                const connectWebSocket = () => {
+                    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+                    ws = new WebSocket(`${protocol}//${window.location.host}/ws`);
+                    
+                    ws.onmessage = (event) => {
+                        try {
+                            state.value = JSON.parse(event.data);
+                        } catch (e) { console.error("Hibás adat:", e); }
+                    };
+
+                    ws.onclose = () => {
+                        state.value.connection_status = "KAPCSOLAT MEGSZAKADT";
+                        state.value.is_connected = false;
+                        setTimeout(connectWebSocket, 2000);
+                    };
+                    
+                    ws.onerror = () => {
+                        state.value.error_msg = "WebSocket hiba!";
+                    };
+                };
+
+                const testRadio = () => {
+                    if (ws && ws.readyState === WebSocket.OPEN) {
+                        ws.send(JSON.stringify({ action: "test_radio" }));
+                    }
+                };
+
+                onMounted(() => {
+                    connectWebSocket();
+                });
+
+                return { state, testRadio, getWeatherIcon };
+            }
+        }).mount('#app');
+    </script>
+</body>
+</html>

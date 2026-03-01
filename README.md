@@ -33,7 +33,10 @@ In-Game Settings
 •	Navigate to Settings -> Telemetry Settings.
 •	UDP Telemetry: ON
 •	UDP Port: 20777
-•	UDP Format: 2023, 2024, or 2025
+•	UDP Format: 2023
+UDP Broadcast: Set to OFF (Crucial for console-to-PC communication).
+UDP IP Address: Enter the local IP address of your PC (the one shown in the ZeroPoint Race console, e.g., 192.168.1.15).
+UDP Send Rate: 20Hz or 60Hz.
 ________________________________________
 ☕ Support
 If you enjoy this project and want to support its development:

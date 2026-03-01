@@ -37,4 +37,4 @@ In-Game Settings
 ________________________________________
 ☕ Support
 If you enjoy this project and want to support its development:
-Buy Me A Coffee
+https://buymeacoffee.com/zeropointrace

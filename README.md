@@ -6,7 +6,7 @@ Intelligent F1 Race Engineer &amp; Telemetry Dashboard for F1 23/24/25.
 •	Priority Messaging: Critical info (blue flags, safety cars, penalties) instantly interrupts regular updates.
 •	System Reports: Automatic connection check and track identification upon startup.
 2. Real-Time Telemetry Processing
-•	Multi-Game Support: Recognizes UDP packet formats for F1 23, 24, and 25.
+•	Multi-Game Support: Recognizes UDP packet formats for F1 23
 •	Damage & Wear: Monitors front/rear wing damage, floor status, and tire wear percentages.
 •	Thermal Management: Alerts if tires are too cold (below 80°C) or critically hot (above 105°C).
 3. Strategy & Weather Radar
@@ -36,7 +36,7 @@ In-Game Settings
 •	UDP Format: 2023
 UDP Broadcast: Set to OFF (Crucial for console-to-PC communication).
 UDP IP Address: Enter the local IP address of your PC (the one shown in the ZeroPoint Race console, e.g., 192.168.1.15).
-UDP Send Rate: 20Hz or 60Hz.
+UDP Send Rate: 20Hz or 30Hz.
 ________________________________________
 ☕ Support
 If you enjoy this project and want to support its development:
